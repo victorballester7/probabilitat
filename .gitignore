@@ -1,5 +1,8 @@
 *.pdf
 
+# R file
+.Rhistory
+
 # Tex files
 *.aux
 *.bbl

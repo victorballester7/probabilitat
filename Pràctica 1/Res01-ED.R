@@ -55,3 +55,4 @@ a = b[b > 0]
 a
 probabilitat2 = length(a) / length(b)
 probabilitat2 # en efecte, surt el mateix resultat que abans
+
