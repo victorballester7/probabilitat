@@ -1,0 +1,198 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm, amsmath, mathtools, amssymb}
+\usepackage[left=2.8cm,right=2.8cm,top=3cm,bottom=3cm]{geometry}
+\usepackage[colorlinks, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{dsfont}
+\usepackage{xcolor}
+\usepackage{listings} 
+\usepackage[catalan,english]{babel}
+\usepackage[affil-it]{authblk}
+\usepackage{multirow}
+\usepackage{physics}
+
+%%%%%% pel codi, que quedi maco %%%%
+
+\renewcommand{\lstlistingname}{Programa}
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
+\lstloadlanguages{C,Python,R}
+\lstset{ %
+        backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+        basicstyle=\color{red}\footnotesize\ttfamily,        % the size of the fonts that are used for the code
+        breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+        breaklines=true,                 % sets automatic line breaking
+        captionpos=b,                    % sets the caption-position to bottom
+        deletekeywords={...},            % if you want to delete keywords from the given language
+        escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+        extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+        frame=single,                    % adds a frame around the code
+        keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+        keywordstyle=\color{darkblue},       % keyword style
+        commentstyle=\itshape\color{gray},
+        identifierstyle=\color{black},
+        language=R,                 % the language of the code
+        otherkeywords={*,...},           % if you want to add more keywords to the set
+        numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+        numbersep=5pt,                   % how far the line-numbers are from the code
+        numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
+        rulecolor=\color{gray},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+        showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+        showstringspaces=false,          % underline spaces within strings only
+        showtabs=false,                  % show tabs within strings adding particular underscores
+        stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+        stringstyle=\color{blue},     % string literal style
+        tabsize=2,                         % sets default tabsize to 2 spaces
+        %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\lstset{literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+        {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+        {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+        {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+        {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+        {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+        {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+        {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+        {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+        {€}{{\EUR}}1 {£}{{\pounds}}1
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{\bfseries\Large Pràctica 3. Mètodes de Monte Carlo}
+
+\author{Júlia Albero Pes, NIU: 1566550\endgraf Víctor Ballester Ribó, NIU: 1570866\endgraf Carlos Caralps Rueda, NIU: 1563704\endgraf Montserrat Contel Bustos, NIU: 1527884\endgraf Ramon Gallardo Campos, NIU: 1564856}
+\date{\parbox{\linewidth}{\centering
+  Probabilitat i Modelització Estocàstica\endgraf
+  Grau en Matemàtiques\endgraf
+  Universitat Autònoma de Barcelona\endgraf
+  Desembre de 2021}}
+
+\setlength{\parindent}{0pt}
+\begin{document}
+\selectlanguage{catalan}
+\newgeometry{top=6cm}
+\maketitle
+\begin{abstract}
+  \noindent En aquesta pràctica veurem dos mètodes de Monte Carlo per calcular integrals definides d'una dimensió mitjançant nombres aleatoris. Per començar utilitzarem el mètode d'encertar o fallar (\textit{hit-or-miss}) i seguidament calcularem les integrals a partir del mètode de mostrejar allí on és important (\textit{importance sampling}). En ambdós casos, compararem els valors obtinguts amb els valors de les integrals calculats numèricament.
+\end{abstract}
+\thispagestyle{empty}
+\newpage
+\setcounter{page}{1}
+\restoregeometry
+\newpage
+
+\section*{Problema 1}
+\textbf{Calculeu per Monte Carlo ($n=10^4$) la integral
+$$\int_{0}^{1}(1-x^2)^{\frac{3}{2}}dx$$
+Calculeu amb l'R un valor numèric d'aquest integral i compareu ambdós resultats.}
+
+Observem que la funció $(1-x^2)^{\frac{3}{2}}$ és estrictament decreixent a l'interval $(0,1)$ ja que la seva derivada, $\frac{-6(1-x^2)^{\frac{1}{2}}}{2}$, és estrictament negativa sobre l'interval anomenat. D'aquesta manera deduïm que el màxim sobre aquest interval s'assoleix a $x=0$. Per tant obtenim que $c=(1-0^2)^{\frac{3}{2}}=1$. Seguint amb el métode Monte Carlo, exposem les línies de codi utilitzades per a aproximar la integral:
+\begin{lstlisting}[language=R, caption={Programa del problema 1},xleftmargin=.08\textwidth,xrightmargin=.08\textwidth]
+library(MASS)
+f=function(x){(1-x^2)^(3/2)}
+n=10^4 ; x=runif(n) ; y=runif(n)
+Imonte=sum(y<f(x))/n ; Inum=area(f,0,1) ; Imonte; Inum
+error=abs(Inum-Imonte); error
+\end{lstlisting}
+
+D'aquesta manera obtenim que la aproximació numérica de la integral feta per l'$\textbf{R}$ és $0.5890489$ mentre que l'aproximació per Monte Carlo és $0.5822$ i, per tant, obtenim que la diferència entre aquestes dues aproximacions és de $0.006848871$. Concloem, doncs, que el mètode de Monte Carlo és un bon métode per a calcular aquesta integral tenint en compte els pocs càlculs que ha hagut de realitzar l'ordinador.
+
+\section*{Problema 3}
+\textbf{Definim $I_n^{e,1}$ com l'expressió}
+$$I_n^{e,1}:=e^{-5}\frac{1}{n}\sum_{j=1}^n \left(X_j+5\right)^2$$
+\textbf{Calculeu $I_n^{e,1}$ amb $n=10^4$. Utilitzant de nou el valor exacte que dóna l'R d'aquesta integral, calculeu l'error.}\\
+L'objectiu és calcular la integral $\displaystyle I=\int_5^{\infty}x^2e^{-x}dx$, però ara farem servir el mètode de \textit{importance sampling}. Sigui la variable aleatòria $Y=X+5$, on $X\sim \text{Exp}(1)$. Sabem que la seva funció de distribució és $\displaystyle f_1(x)=e^{-x+5}\vb{1}_{(5,\infty)}$ i, per tant:
+$$I=\int_5^{\infty}x^2e^{-x}\dd x=e^{-5}\int_5^{\infty}x^2e^{x+5}\dd x=e^{-5}\int_5^{\infty}x^2f_1(x)\dd x=e^{-5}\mathbb{E}(Y^2)=e^{-5}\mathbb{E}({(X+5)}^2)$$
+Fent servir el mètode Monte Carlo obtenim que $I\approx I_n^{e,1}$. Executant el següent codi obtindrem un resultat de $I_n^{e,1}$ i la seva diferència amb la integral $I$.
+\newpage
+\begin{lstlisting}[language=R, caption={Programa del problema 3},xleftmargin=.22\textwidth,xrightmargin=.22\textwidth]
+n=10^4
+Isum=exp(-5)*sum((rexp(n)+5)^2)/n; Isum
+g=function(x){x^2*exp(-x)}
+Inum=integrate(g,5,Inf)
+error=abs(Inum$value-Isum); error
+\end{lstlisting}
+D'aquest programa obtenim el valor $0.2490734$ com a resultat de $I_n^{e,1}$, amb $n=10^4$, i una diferència de $2.306629\cdot 10^{-4}$ amb el valor exacte de la integral $I$.
+
+\section*{Problema 4}
+\textbf{Calculeu 10 valors de la integral (cadascun amb $n=10^4$) $$I=\int_5^\infty x^2e^{-x}\dd x$$ amb densitat $f=e^{-x}\vb{1}_{(0,\infty)}(x)$ i 10 valors amb la densitat $f_1=e^{-x+5}\vb{1}_{(5,\infty)}(x)$. Noteu que els primers 10 valors estan més dispersos que els 10 obtinguts amb la segona densitat. Per exemple, podeu representar en una recta els valors calculats amb les dues densitats (uns en color vermell, els altres en color blau). Representeu en aquesta recta el valor exacte (en negre).}
+
+Sabem que podem aproximar la integral $I$ amb les fórmules
+$$I\approx \frac{1}{n}\sum_{j=1}^n{X_j}^2\vb{1}_{(5,\infty)}(X_j)\quad\text{o}\quad I\approx e^{-5}\frac{1}{n}\sum_{j=1}^n{(X_j+5)}^2$$
+segons si utilitzem la densitat $f$ o la densitat $f_1$, respectivament. Aquí $X_j$ són variables aleatòries amb distribució $X_j\sim\text{Exp}(1)$ per a $j=1,\ldots,n$. Executant les dues primeres línies del programa \ref{prog4} obtenim les següents aproximacions de $I$ prenent sempre $n=10^4$:
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+          & \multicolumn{5}{c|}{Aproximacions de $I$}                                                              \\
+    \cline{2-6}
+          & Experiment 1                              & Experiment 2 & Experiment 3 & Experiment 4 & Experiment 5  \\
+    \hline
+    $f$   & 0.2312640                                 & 0.2985635    & 0.2693273    & 0.1795237    & 0.2492527     \\
+    \hline
+    $f_1$ & 0.2502870                                 & 0.2475712    & 0.2487428    & 0.2477368    & 0.2499477     \\
+    \hline
+    \hline
+          & Experiment 6                              & Experiment 7 & Experiment 8 & Experiment 9 & Experiment 10 \\
+    \hline
+    $f$   & 0.2374167                                 & 0.2235842    & 0.2926391    & 0.2755518    & 0.774109      \\
+    \hline
+    $f_1$ & 0.2496138                                 & 0.2503931    & 0.2487146    & 0.2482416    & 0.2509407     \\
+    \hline
+  \end{tabular}
+  \caption{Aproximacions de $I$ utilitzant $n=10^4$ variables aleatòries i a través de la densitat $f$ i la densitat $f_1$.}
+\end{table}
+
+El valor exacte de la integral és fàcilment calculable i dona $I=37e^{-5}=0.24930403...$ Per tant, comparant aquest valor amb els valors obtinguts en la taula podem observar que utilitzant la densitat $f_1$ s'obtenen, en general, millors resultats. Comprovem aquest fet ara gràficament.
+\newpage
+\begin{figure}
+  \centering
+  \includegraphics[width=10cm]{prob3_image.pdf}
+  \caption{Representació gràfica de les aproximacions de $I$: en vermell, les aproximacions fetes amb la densitat $f$; en blau, les aproximacions fetes amb la densitat $f_1$, i en negre, el valor exacte de $I$.}
+  \label{graf1}
+\end{figure}
+
+Com podem veure al gràfic, les aproximacions corresponents a usar la densitat $f_1$ (punts blaus) estan molt més a prop del valor exacte de $I$ (punt negre). En canvi, els valors calculats usant la densitat $f$ (punts vermells) estan molt més dispersos.
+
+Una altra manera de comprovar com de millor són les aproximacions fetes amb la densitat $f_1$ respecte la densitat $f$ és calcular els valors $${\sigma_f}^2=\int_5^\infty\frac{{g(x)}^2}{f(x)}\dd x-I^2\quad\text{i}\quad {\sigma_{f_1}}^2=\int_5^\infty\frac{{g(x)}^2}{f_1(x)}\dd x-I^2,\qquad\text{on }g(x)=x^2e^{-x}$$ i veure que ${\sigma_{f_1}}^2<{\sigma_f}^2$. Executant les últimes línies del programa que mostrem a continuació obtenim valors de ${\sigma_f}^2=10.50969$ i ${\sigma_{f_1}}^2=9.079986\times 10^{-3}$, d'on observem clarament que ${\sigma_{f_1}}^2<{\sigma_f}^2$ i, per tant, el càlcul amb $f_1$ dona resultats més concentrats al voltant de la mitjana que el càlcul amb $f$, que és el que havíem observat gràficament.
+
+El programa que hem utilitzat per aquest exercici és el següent:
+\begin{lstlisting}[language=R, caption={Programa del problema 4},label={prog4},xleftmargin=.05\textwidth,xrightmargin=.05\textwidth]
+h=function(x){x^2*(x>5)}
+h1=function(x){exp(-5)*(x+5)^2}
+Imonte10_f=replicate(10,sum(h(rexp(n)))/n);Imonte10_f
+Imonte10_f1=replicate(10,sum(h1(rexp(n)))/n);Imonte10_f1
+zero=rep(0,10);zero 
+plot(Imonte10_f,zero,col = "red",xlab="",ylab="")
+points(Imonte10_f1,zero,col = "cyan")
+points(Inum$value,0,col = "black")
+legend('top',c('Densiat f','Denistat f1','Integral I'),lty=c(1,1,1),col=c("red","cyan","black"))
+int1=function(x){h(x)*g(x)}
+int2=function(x){h1(x-5)*g(x)}
+of=integrate(int1,5,Inf)$value-Inum$value^2;of
+of1=integrate(int2,5,Inf)$value-Inum$value^2;of1
+\end{lstlisting}
+Les quatre primeres línies calculen els 20 valors que hem exposat a la taula mentre que les quatre últimes calculen els valors ${\sigma_f}^2$ i ${\sigma_{f_1}}^2$. La resta de codi serveix per crear el gràfic que hem mostrat.
+
+\section*{Problema 5}
+\textbf{Retornant al problema 1, calculeu la integral $\int_{0}^{1}\exp(e^x)\dd x$ utilitzant el mètode de \textit{importance sampling} amb una densitat instrumental uniforme a $(0,1)$, i calculeu l'error.}
+
+Per fer servir el mètode de \textit{importance sampling} utilitzarem la densitat d'una uniforme d'una uniforme $U\sim \mathcal{U}\text{(0,1)}$. Així, obtenim que la integral que volem calcular es pot aproximar de la següent forma
+$$\int_{0}^1 \exp(e^x)\dd x=\mathbb{E}[\exp(e^U)]\approx \frac{1}{n}\sum_{j=1}^n \exp(e^{U_j})$$
+amb $U_1,\dots,U_n$ són variable aleatòries independents idènticament distribuïdes a $\mathcal{U}(0,1)$.
+El codi utilitzat per calcular la integral $\int_{0}^{1}\exp(e^x)\dd x$ amb \textit{importance sampling} és el següent:
+
+\begin{lstlisting}[language=R, caption={Programa del problema 5},xleftmargin=.08\textwidth,xrightmargin=.08\textwidth]
+g=function(x){exp(exp(x))}
+n=10^4 ; u=runif(n) ; 
+Inum=area(g,0,1)
+Isampling=sum(g(u))/n
+Isampling; Inum
+error=abs(Inum-Isampling); error
+\end{lstlisting}
+A través d'aquest mètode obtenim que l'aproximació per \textit{importance sampling} és $6.314803$, mentre que el valor de la integral és $6.316564$. Aleshores, el valor de l'error és $0.01422611$.
+
+\end{document}

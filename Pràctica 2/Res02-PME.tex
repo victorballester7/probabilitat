@@ -1,0 +1,251 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm, amsmath, mathtools, amssymb}
+\usepackage[left=2.8cm,right=2.8cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{dsfont}
+\usepackage{xcolor}
+\usepackage{listings} 
+\usepackage[catalan,english]{babel}
+\usepackage[affil-it]{authblk}
+\usepackage{multirow}
+\usepackage{physics}
+
+%%%%%% pel codi, que quedi maco %%%%
+
+\renewcommand{\lstlistingname}{Programa}
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
+\lstloadlanguages{C,Python,R}
+\lstset{ %
+        backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+        basicstyle=\color{red}\footnotesize\ttfamily,        % the size of the fonts that are used for the code
+        breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+        breaklines=true,                 % sets automatic line breaking
+        captionpos=b,                    % sets the caption-position to bottom
+        deletekeywords={...},            % if you want to delete keywords from the given language
+        escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+        extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+        frame=single,                    % adds a frame around the code
+        keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+        keywordstyle=\color{darkblue},       % keyword style
+        commentstyle=\itshape\color{gray},
+        identifierstyle=\color{black},
+        language=R,                 % the language of the code
+        otherkeywords={*,...},           % if you want to add more keywords to the set
+        numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+        numbersep=5pt,                   % how far the line-numbers are from the code
+        numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
+        rulecolor=\color{gray},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+        showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+        showstringspaces=false,          % underline spaces within strings only
+        showtabs=false,                  % show tabs within strings adding particular underscores
+        stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+        stringstyle=\color{blue},     % string literal style
+        tabsize=2,                         % sets default tabsize to 2 spaces
+        %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\lstset{literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+        {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+        {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+        {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+        {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+        {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+        {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+        {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+        {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+        {€}{{\EUR}}1 {£}{{\pounds}}1
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{\bfseries\Large Pràctica 2. Càlcul de probabilitats per simulació}
+
+\author{Júlia Albero Pes, NIU: 1566550\endgraf Víctor Ballester Ribó, NIU: 1570866\endgraf Carlos Caralps Rueda, NIU: 1563704\endgraf Montserrat Contel Bustos, NIU: 1527884\endgraf Ramon Gallardo Campos, NIU: 1564856}
+\date{\parbox{\linewidth}{\centering
+  Probabilitat i Modelització Estocàstica\endgraf
+  Grau en Matemàtiques\endgraf
+  Universitat Autònoma de Barcelona\endgraf
+  Desembre de 2021}}
+
+\setlength{\parindent}{0pt}
+\begin{document}
+\selectlanguage{catalan}
+\newgeometry{top=6cm}
+\maketitle
+\begin{abstract}
+  \noindent En aquesta pràctica utilitzarem la propietat de convergència de les freqüències relatives d’ocurrència d'un esdeveniment a la seva probabilitat per calcular diverses probabilitats.
+  D'aquesta manera, resoldrem el problema del Cavaller de Meré i comprovarem que els errors produïts són inferiors a una determinada cota. A més, aproximarem la probabilitat que dues persones es trobin en una cafeteria i també estudiarem el problema de Buffon. Finalment obtindrem, de dues maneres diferents, aproximacions per al número $\pi$ i estimarem la probabilitat de formar un triangle trencant un segment en tres trossos.
+\end{abstract}
+\thispagestyle{empty}
+\newpage
+\setcounter{page}{1}
+\restoregeometry
+\newpage
+
+\section*{Problema 1}
+\textbf{Simuleu $n=10^5$ cops 24 llançaments de dos daus i compteu en quantes simulacions hi ha almenys un doble 6. Calculeu la probabilitat teòrica amb l'estimació.}\\
+D'entrada notem que llençar dos daus ens dona l'espai equiprobable de resultats $\Omega=\{(1,1),(1,2),\ldots,(6,6)\}$, que és equivalent al que proporciona una variable uniforme en el conjunt $\{1,2,\ldots,36\}$. Per tant, calcularem la freqüència relativa d'obtenir un 6 en el conjunt anterior i serà equivalent a obtenir un doble 6 en $\Omega$.\\
+Recordem que la freqüència relativa de vegades que ha passat $A$ és:
+$$f_n(A)=\frac{\text{Nombre de vegades que ha passat $A$}}{n}$$
+on $n$ és el nombre de repeticions de l'experiment i $A$ és l'esdeveniment que considerem, en el nostre cas $A$ = ``obtenir almenys un doble 6 en 24 llançaments de dos daus".\\
+Per calcular el nombre de vegades que ha passat $A$ definim una funció que compti les vegades que succeeix $A$ en l'experiment realitzat. Un cop definida aquesta funció, en definim una segona que en permeti calcular la freqüència relativa: repeteix l'experiment $n$ vegades i calcula quantes vegades d'aquestes $n$ ha succeït $A$, i calcula la freqüència relativa dividint-ho per $n$.
+El programa en qüestió és el següent:
+\begin{lstlisting}[language=R, caption={Programa del problema 1, on nd és el número de daus i nt és el número de tirades},xleftmargin=.08\textwidth,xrightmargin=.08\textwidth]
+pertany6=function(x){sum(x==6)>0}
+fn=function(n,nd,nt){
+  sum(replicate(n,pertany6(sample(1:(6^nd),nt,replace=TRUE))))/n
+}
+fn(10^5,2,24)
+\end{lstlisting}
+Si simulem $10^5$ cops l'experiment obtenim una freqüència relativa de 0.49177.
+
+Comparem ara la probabilitat estimada a partir de les freqüències relatives amb la probabilitat teòrica, que és la següent:
+$$\mathbb{P}(A)=1-\Big(\frac{35}{36}\Big)^{24}\approx 0.49140$$ D'altra banda, recordem que: $$\lim_{n}f_n(A)=\mathbb{P}(A)$$
+Podem observar que la freqüència relativa obtinguda s'aproximen prou bé a la probabilitat teòrica.
+
+\section*{Problema 2}
+\textbf{Per a $n=10^4,10^5,10^6$ calculeu els errors produïts, i dieu si estan d'acord amb la cota d'error $1/\sqrt{n}$.}\\
+Sabent la probabilitat teòrica de l'esdeveniment, per a cada $n=10^4,10^5,10^6$ es realitzarà 3 vegades el càlcul de l'error. Així, per fer el càlcul de l'error definim la funció $|f_{n}(A)-\mathbb{P}(A)|$ al programa en R i d'aquesta manera només hem d'afegir les línies següents al codi del problema anterior:
+\newpage
+\begin{lstlisting}[language=R, caption={Línies de codi a afegir al programa del problema 1 per a obtenir el programa del problema 2},xleftmargin=.16\textwidth,xrightmargin=.16\textwidth]
+p=1-(35/36)^24
+error=function(n,nd,nt){abs(fn(n,nd,nt)-p)}
+for(i in 4:6){
+  print(replicate(3,error(10^i,2,24)))
+}
+\end{lstlisting}
+A continuació posem en una taula els errors i les acotacions per $1/\sqrt{n}$.
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+             & \multicolumn{3}{|c|}{$|f_{n}(A)-\mathbb{P}(A)|$} & \multirow{2}*{$1/\sqrt{n}$}                               \\
+    \cline{2-4}
+             & 1r experiment                                    & 2n experiment               & 3r experiment &             \\
+    \hline
+    $n=10^4$ & 0.003096124                                      & 0.001703876                 & 0.004003876   & 0.01        \\
+    \hline
+    $n=10^5$ & 0.002016124                                      & 0.001166124                 & 0.0004838761  & 0.003162278 \\
+    \hline
+    $n=10^6$ & 0.0007718761                                     & 0.0005051239                & 0.0002278761  & 0.001       \\
+    \hline
+  \end{tabular}
+  \caption{Càlcul de l'error i acotació de les probabilitats de treure un doble $6$ en $24$ llançaments de dos daus.}
+\end{table}
+
+D'aquesta manera, es pot observar que els errors obtinguts en calcular la probabilitat $\mathbb{P}(A)$ estan d'acord amb la cota d'error $1/\sqrt{n}$. De tota manera, notem que podria passar que obtinguéssim un error més gran que la cota de $1/\sqrt{n}$ ja que aquesta és aproximada.
+
+\section*{Problema 3}
+\textbf{Dues persones van a prendre el cafè al mateix bar entre les 10 i les 11 del matí. Cadascuna s'està 10 minuts prenent el cafè. Mitjançant una simulació, on és repeteixi $n=10^5$ la situació exposada, doneu una estimació de la probabilitat que les dues persones es trobin.}\\
+Considerarem dues variables aleatòries $X$ i $Y$ independents, uniformes a l'interval $[0,60]$. Aquestes variables fan referència al minut en què cada persona arriba al bar per prendre's el cafè. Així doncs, la probabilitat que es trobin al bar serà $\mathbb{P}\left(|X-Y|\leq 10\right)$. Cal destacar que considerem que si un entra i l'altre surt al mateix minut (la diferencia $|X-Y|$ és exactament 10) es saluden i, per tant, s'han trobat.\\
+A continuació realitzem un programa en R per simular aquesta situació i estimar la probabilitat que les dues persones es trobin. Per realitzar el programa necessitem utilitzar la funció \textcolor{blue}{runif(n,0,60)}, que genera un valor aleatori de l'interval $[0,60]$ $n$ vegades.
+\begin{lstlisting}[language=R, caption={Programa de la trobada a la cafeteria},xleftmargin=.23\textwidth,xrightmargin=.23\textwidth]
+n=10^5
+trobada=function(x,y){sum(abs(x-y)<=10)}
+trobada(runif(n,0,60),runif(n,0,60))/n
+\end{lstlisting}
+Executant el programa obtenim una estimació de la probabilitat que es trobin les dues persones de $0.30473$.
+\newpage
+\section*{Problema 4}
+\textbf{Considereu el problema de Buffon, amb llistons para\lgem els d'amplada $a=2$ i una agulla de longitud $\ell=1$. Estimeu la probabilitat que l'agulla talli una línia horitzontal fent $n$ llançaments, amb $n=10^4$ i $n=10^5$.}
+
+Tirar l'agulla aleatòriament en un taulell, és equivalent a donar dues variables aleatòries uniformes corresponents al punt $(x,y)$ del centre de l'agulla o, equivalentment, a donar les dues variables aleatòries següents: una variable aleatòria $X$ uniforme a l'interval $[0,a/2]$ corresponent a la distància del centre de l'agulla al llistó més proper i una variable aleatòria $\Theta$ uniforme a l'interval $[0,\pi]$ corresponent a l'angle que forma l'agulla amb l'eix horitzontal (respecte d'una orientació prefixada). Farem servir aquestes dues últimes variables aleatòries per estimar la probabilitat desitjada.
+
+Sabem que obtindrem un èxit, és a dir, que l'agulla tallarà un dels llistons para\lgem els, quan es satisfaci: $$X\leq \frac{\ell}{2}\sin\Theta$$
+El programa que hem utilitzat per a calcular aproximacions de $\mathbb{P}(X\leq \frac{\ell}{2}\sin\Theta)$ és el següent:
+\begin{lstlisting}[language=R, caption={Programa del problema 4},xleftmargin=.25\textwidth,xrightmargin=.25\textwidth]
+agullatalla=function(n){
+  l=1; a=2
+  x=a/2*runif(n)
+  o=pi*runif(n)
+  sum(x<=l/2*sin(o))
+}
+p1=agullatalla(10^4)/10^4;p1
+p2=agullatalla(10^5)/10^5;p2
+\end{lstlisting}
+El programa calcula les dues variables aleatòries comentades anteriorment i retorna el nombre de vegades que l'agulla talla un dels llistons.
+
+Si executem el programa amb $n=10^4,10^5$ obtenim els següents resultats:
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+             & Aproximacions de $\mathbb{P}(X\leq \frac{\ell}{2}\sin\Theta)$ \\
+    \hline
+    $n=10^4$ & 0.3206                                                        \\
+    \hline
+    $n=10^5$ & 0.31928                                                       \\
+    \hline
+  \end{tabular}
+  \caption{Probabilitat que l'agulla talli un dels llistons fent $n$ llançaments amb $n=10^4,10^5$.}
+\end{table}
+\section*{Problema 5}
+\textbf{Calculeu les aproximacions de $\pi$ que s’obtenen a partir de les simulacions anteriors.}
+
+Si $p$ és la probabilitat teòrica calculada a l'apartat anterior, aleshores sabem que: $$p=\frac{2\ell}{\pi a}$$
+Per tant, en el nostre cas ($\ell=1$ i $a=2$), tenim que $\pi=\frac{1}{p}$. Així doncs, si $p_n$ són les probabilitats aproximades calculades a l'apartat anterior, podem aproximar $\pi$ com: $$\pi\approx \frac{1}{p_n}$$
+El programa que hem utilitzat per a calcular tal aproximació, on hem utilitzat la notació del programa anterior, és el següent:
+\begin{lstlisting}[language=R, caption={Programa del problema 5},xleftmargin=.3\textwidth,xrightmargin=.3\textwidth]
+pi1=1/p1;pi1
+pi2=1/p2;pi2
+\end{lstlisting}
+En la taula següent es mostren les aproximacions de $\pi$ obtingudes a partir dels resultats del problema anterior.
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{|c|c|c|c|}
+    \hline
+             & Aproximacions de $\pi$ \\
+    \hline
+    $n=10^4$ & 3.119152               \\
+    \hline
+    $n=10^5$ & 3.132047               \\
+    \hline
+  \end{tabular}
+  \caption{Aproximacions de $\pi=3.14159...$ a partir de l'experiment aleatori de l'agulla de Buffon.}
+\end{table}
+
+Observem que amb $n=10^5$ obtenim una millor aproximació de $\pi$ que amb $n=10^4$.
+\section*{Problema 6}
+\textbf{Doneu la probabilitat que un punt en un quadrat de costat de mida $2$ estigui al cercle unitari inscrit. A partir d'aquesta probabilitat estimeu per simulació el nombre $\pi$.}\\
+Per tal de calcular la probabilitat que un punt $(x,y)$ escollit aleatòriament dins d'un quadrat de costat de mida $2$ es trobi dins de la circumferència inscrita de radi $1$, considerem $a,b\in \mathbb{R}$ tals que $b-a=2$ i definim el quadrat i la circumferència respectivament com:
+\begin{gather*}
+  D_{(a,b)}=\{(x,y)\in \mathbb{R}^2\mid a\leq x\leq b\text{,  } a\leq y\leq b\}=[a,b]^2\\
+  \textstyle C_{(a,b)}=\{(x,y)\in D_{(a,b)}\mid (x-\frac{a+b}{2})^2+(y-\frac{a+b}{2})^2=1 \}
+\end{gather*}
+Per tant, escollir aleatòriament un punt $(x,y)\in D_{(a,b)}$ és equivalent a considerar un vector aleatori amb llei uniforme sobre $D_{(a,b)}$, és a dir $(X,Y)\sim \mathcal{U}(D_{(a,b)})$. Així la seva funció de densitat conjunta és $f(x,y)=\frac{1}{\text{area}(D_{(a,b)})}\mathds{1}_{[a,b]^2}(x,y)=\frac{1}{4}\mathds{1}_{[a,b]^2}(x,y)$ de manera que la probabilitat que $(x,y)\in C_{(a,b)}$ ve donada per:
+\begin{equation*}
+  \mathbb{P}((X,Y)\in C_{(a,b)})=\iint \limits_{C_{(a,b)}} f(x,y)\dd x\dd y=\iint \limits_{C_{(a,b)}} \frac{1}{4}\mathds{1}_{[a,b]^2}(x,y)\dd x\dd y= \int \limits_{0}^{2\pi}\int \limits_{0}^{1}\frac{1}{4}r\dd r\dd \theta=\frac{\pi}{4}
+\end{equation*} On a la tercera igualtat hem usat que $\mathds{1}_{[a,b]^2}(x,y)=1$ ja que $C_{(a,b)}\subset D_{(a,b)}$ i hem fet el canvi a coordenades polars $x-\frac{a+b}{2}=r\cos(\theta)$, $y-\frac{a+b}{2}=r\sin(\theta)$, $\dd x\dd y=r\dd r\dd \theta$ on $r\in[0,1],\theta\in[0,2\pi]$.\\
+Anomenem $p$ la probabilitat calculada teòricament. Sigui l'esdeveniment $A=$ ``que el punt escollit pertanyi al cercle unitari inscrit''. Com hem vist, podem aproximar $p$ a partir de la freqüència relativa \[ \lim_{n\to\infty} f_n(A) =\lim_{n\to\infty} p_n=p=\frac{\pi}{4}\] Obtenim que $4\cdot p=\pi$ i d'aquesta manera podem obtenir una aproximació de $\pi$ a partir de simulacions de $p$, és a dir,  $4\cdot p_n \approx\pi $.\\ Per tal de donar valors al programa, podem considerar $a=-1$, $b=1$. Així $D_{(-1,1)}=[-1,1]^2$ i $C_{(-1,1)}$ és el cercle unitari centrat a L'origen. De nou, com hem fet teòricament, el vector aleatori $(X,Y)$ segueix una llei uniforme al quadrat $[-1,1]^2$, i donat que les variables $X$ i $Y$ son independents una de l'altra, obtenim que $X,Y\sim \mathcal{U}(-1,1)$ cadascuna. Si, a més, volem que el punt $(x,y)$ es trobi dins del cercle unitari, és necessari que la condició $x^2+y^2\leq1$ sigui certa. És a dir, únicament obtindrem èxit quan es compleixi: $$X^2+Y^2\leq1$$
+El programa emprat per les simulacions de $\mathbb{P}(X^2+Y^2\leq1)$ és el següent:
+\begin{lstlisting}[language=R,caption={Programa del problema 6},xleftmargin=.20\textwidth,xrightmargin=.20\textwidth]
+aprox=function(n){
+  x=runif(n,-1,1);
+  y=runif(n,-1,1);
+  c(sum(x^2+y^2<=1)/n, sum(x^2+y^2<=1)/n*4)
+}
+aprox(10^5)
+\end{lstlisting}
+Si executem el programa amb $n=10^5$ obtenim un valor de 0.78473 i, per tant, l'aproximació de $\pi$ següent: $$\pi\approx 3.13892$$
+
+\section*{Problema 7}
+\textbf{Tenim un segment de longitud 1 i el trenquem en tres trossos escollit dos punts a l'atzar. Simuleu $n=10^5$ trencaments del segment i estimeu la probabilitat que es pugui fer un triangle amb aquests trossos.}\\
+Per realitzar aquest problema considerarem dues variables aleatòries $U$ i $V$, uniformes en l'interval $[0,1]$. Aquestes representaran els punts on tallem el segment, així que per facilitar la notació realitzem el canvi de variables $X=\min(U,V)$ i $Y=\max(U,V)$. Així doncs, obtindrem tres subsegments de longituds $X$, $Y-X$ i $1-Y$ respectivament.\\
+Per tal de poder formar un triangle amb 3 segments, cal que la suma de les longituds de dos d'aquests segments qualssevol sigui més gran que el segment restant. Simplifiquem aquestes condicions en els tres casos possibles, començant per la suma del primer segment amb el segon:
+$$X+(Y-X)>1-Y\Longleftrightarrow Y>\frac{1}{2}\Longleftrightarrow \max(U,V)>\frac{1}{2}$$
+En el cas de sumar la longitud del segon segment amb el tercer obtenim la condició:
+$$Y-X+(1-Y)>X\Longleftrightarrow\frac{1}{2}>X\Longleftrightarrow \min(U,V)<\frac{1}{2}$$
+Finalment, en el cas que suméssim les longituds del primer i el tercer segment obtindríem la condició:
+$$X+(1-Y)>Y-X\Longleftrightarrow Y-X<\frac{1}{2}\Longleftrightarrow \max(U,V)-\min(U,V)<\frac{1}{2}\Longleftrightarrow |U-V|<\frac{1}{2}$$
+Imposant aquestes tres condicions obtindrem els casos on es pot formar un triangle. Tenint-ho en compte formem el programa en llenguatge R que ens realitza una estimació de la probabilitat de poder formar un triangle. Per realitzar aquest programa hem utilitzat les funcions \textcolor{blue}{pmax} i \textcolor{blue}{pmin} que, al introduir-los un vector, retornen un vector on les components són els màxims o mínims, respectivament, dels valors de les components dels dos vectors introduïts.
+\begin{lstlisting}[language=R, caption={Programa formació de triangles},xleftmargin=.15\textwidth,xrightmargin=.15\textwidth]
+n=10^5
+triangle=function(x,y){
+  sum(pmax(x,y)>1/2 & pmin(x,y)<1/2 & abs(x-y)<1/2)
+}
+triangle(runif(n,0,1),runif(n,0,1))/n
+\end{lstlisting}
+Executant el programa obtenim una estimació de la probabilitat de formar un triangle, partint d'un segment de longitud 1 i partint-lo en 3 subsegments aleatòriament, de $0.25025$.
+\end{document}
